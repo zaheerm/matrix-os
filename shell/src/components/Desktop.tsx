@@ -774,6 +774,9 @@ export function Desktop({ launchAppPath, onOpenCommandPalette, chat, cacheScope 
   const previousMode = useDesktopMode((s) => s.previousMode);
   const setDesktopMode = useDesktopMode((s) => s.setMode);
   const visibleModes = useDesktopMode((s) => s.visibleModes);
+  const canonicalChatOpen = windows.some(
+    (windowRecord) => windowRecord.path === "__chat__" && !windowRecord.minimized,
+  );
   const themeStyle = useThemeStyle();
   const osViewLayoutsRef = useRef(createOsViewLayoutMemory());
   // Windows designs replace the mac menu bar + dock with a bottom taskbar.
@@ -1354,14 +1357,19 @@ export function Desktop({ launchAppPath, onOpenCommandPalette, chat, cacheScope 
                     <button
                       type="button"
                       data-testid="dock-chat"
-                      onClick={() => { setChatOpen((v) => !v); setTaskBoardOpen(false); setSettingsOpen(false); }}
+                      onClick={() => {
+                        focusOrOpen("Chat", "__chat__");
+                        setChatOpen(false);
+                        setTaskBoardOpen(false);
+                        setSettingsOpen(false);
+                      }}
                       className={`relative flex items-center justify-center rounded-xl border shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all ${
-                        chatOpen
+                        canonicalChatOpen
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-card border-border/60"
                       }`}
                       style={{ width: dock.iconSize, height: dock.iconSize }}
-                      aria-label={chatOpen ? "Close Hermes" : "Open Hermes"}
+                      aria-label="Chat"
                     >
                       <MessageSquareIcon className="size-4" />
                       {chat?.busy && (
@@ -1442,13 +1450,18 @@ export function Desktop({ launchAppPath, onOpenCommandPalette, chat, cacheScope 
             <button
               type="button"
               data-testid="dock-chat-mobile"
-              onClick={() => { setChatOpen((v) => !v); setTaskBoardOpen(false); setSettingsOpen(false); }}
+              onClick={() => {
+                focusOrOpen("Chat", "__chat__");
+                setChatOpen(false);
+                setTaskBoardOpen(false);
+                setSettingsOpen(false);
+              }}
               className={`relative flex shrink-0 size-9 items-center justify-center rounded-lg border transition-all active:scale-95 ${
-                chatOpen
+                canonicalChatOpen
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card border-border/60"
               }`}
-              aria-label={chatOpen ? "Close Hermes" : "Open Hermes"}
+              aria-label="Chat"
             >
               <MessageSquareIcon className="size-4" />
               {chat?.busy && (
@@ -1653,10 +1666,11 @@ export function Desktop({ launchAppPath, onOpenCommandPalette, chat, cacheScope 
           openExistingProviderTerminal(sessionId);
         }}
       />
-      {/* Single ChatPopover instance shared by desktop + mobile dock
-          buttons. Lives outside both dock-orientation branches so it
-          isn't unmounted when the viewport orientation flips. */}
-      <ChatPopover open={chatOpen} onOpenChange={setChatOpen} />
+      {/* Developer mode retains the legacy quick panel. Web Desktop and Web
+          Canvas route Chat through the canonical __chat__ app window. */}
+      {desktopMode === "dev" ? (
+        <ChatPopover open={chatOpen} onOpenChange={setChatOpen} />
+      ) : null}
 
       {/* No fullscreen exit pill: every maximized window keeps its own header
           (Desktop CardHeader / Canvas in-window title bar) with traffic lights,

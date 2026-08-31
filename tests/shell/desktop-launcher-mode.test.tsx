@@ -101,7 +101,7 @@ vi.mock("../../shell/src/components/ChatApp.js", () => ({
 }));
 
 vi.mock("../../shell/src/components/ChatPopover.js", () => ({
-  ChatPopover: () => null,
+  ChatPopover: ({ open }: { open: boolean }) => open ? <div data-testid="quick-chat-panel" /> : null,
 }));
 
 vi.mock("../../shell/src/components/onboarding/ManualSetupStickers.js", () => ({
@@ -244,6 +244,19 @@ describe("Desktop launcher dock button by mode", () => {
     fireEvent.doubleClick(screen.getByRole("button", { name: "Chat" }));
     expect(windowManagerStore.getState().windows.find((windowRecord) => windowRecord.path === "__chat__"))
       .toMatchObject({ title: "Chat", path: "__chat__" });
+  });
+
+  it("opens canonical Chat from the Web dock instead of the dismissible quick panel", async () => {
+    resetShellMode("canvas", true);
+
+    renderDesktop();
+
+    fireEvent.click(await screen.findByTestId("dock-chat"));
+
+    expect(windowManagerStore.getState().windows.find(
+      (windowRecord) => windowRecord.path === "__chat__",
+    )).toMatchObject({ title: "Chat", path: "__chat__", minimized: false });
+    expect(screen.queryByTestId("quick-chat-panel")).toBeNull();
   });
 
   it("switches Web Desktop to Web Canvas and back from the app launcher without closing apps", async () => {
