@@ -377,7 +377,7 @@ export function ChatApp({
               </span>
               <div className="min-w-0 text-center">
                 <p className="truncate text-sm font-semibold leading-4 text-foreground">
-                  {providerState.activeInstance?.displayName ?? "Matrix Agent"}
+                  {providerState.activeInstance?.displayName ?? "Built-in AI"}
                 </p>
                 <p className="truncate text-[10px] leading-3 text-muted-foreground">
                   {providerState.selected?.modelLabel ?? (providerState.loading ? "Loading AI access" : "AI access unavailable")}

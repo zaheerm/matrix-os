@@ -443,7 +443,7 @@ describe("canonical Chat Provider catalog", () => {
       const owner = catalog.instances.find((instance) => instance.id === "kernel_owner_anthropic_key");
 
       expect(catalog.drivers).toEqual(expect.arrayContaining([
-        expect.objectContaining({ kind: "kernel", displayName: "Matrix Agent" }),
+        expect.objectContaining({ kind: "kernel", displayName: "Claude SDK" }),
       ]));
       expect(matrix).toMatchObject({
         driverKind: "kernel",
