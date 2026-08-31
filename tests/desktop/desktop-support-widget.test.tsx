@@ -9,6 +9,7 @@ import { useConnection } from "@desktop/renderer/src/stores/connection";
 import { useBrowserNavigation } from "@desktop/renderer/src/stores/browser-navigation";
 import { useTabs } from "@desktop/renderer/src/stores/tabs";
 import { useUi } from "@desktop/renderer/src/stores/ui";
+import { useNativeDesktopMode } from "@desktop/renderer/src/stores/native-desktop-mode";
 
 const posthogClient = vi.hoisted(() => ({
   conversations: {
@@ -84,6 +85,7 @@ describe("Desktop support widget", () => {
     useBrowserNavigation.setState(useBrowserNavigation.getInitialState(), true);
     useTabs.setState(useTabs.getInitialState(), true);
     useUi.setState(useUi.getInitialState(), true);
+    useNativeDesktopMode.setState(useNativeDesktopMode.getInitialState(), true);
   });
 
   afterEach(() => {
@@ -190,7 +192,7 @@ describe("Desktop support widget", () => {
     await waitFor(() => expect(screen.queryByRole("button", { name: "Open chat" })).toBeNull());
 
     expect(screen.getAllByRole("button").map((button) => button.getAttribute("aria-label") ?? button.textContent))
-      .toEqual(["Search", "Support", "Main computer", "Open account menu"]);
+      .toEqual(["Desktop mode", "Canvas mode", "Search", "Support", "Main computer", "Open account menu"]);
 
     const unrelatedClose = document.createElement("button");
     unrelatedClose.id = "unrelated-close";
